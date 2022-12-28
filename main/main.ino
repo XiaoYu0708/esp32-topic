@@ -150,6 +150,8 @@ void loop()
   if (config == 1)
   {
     Serial.println("請先選擇地區！");
+    Line("請先選擇地區！");
+    config = 0;
   }
   if (old_time != arr_update_time[0])
   {
