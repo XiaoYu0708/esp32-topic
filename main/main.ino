@@ -2,7 +2,7 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
-#include <cstring>
+#include <CString>
 #include <iostream>
 #include <WiFiClientSecure.h>
 
@@ -182,9 +182,43 @@ void display()
   {
     if (arr_side[n] == Side)
     {
-      String message = "\n地區：" + arr_county[n] + "，" + arr_side[n] + "\n紫外線等級，UV：" + arr_uv[n] + "\n最後更新時間：" + arr_update_time[n];
+      String level = "";
+      if (arr_uv[n].toInt() >= 11)
+      {
+        level = "紫色";
+      }
+      else if (arr_uv[n].toInt() >= 8)
+      {
+        level = "紅色";
+      }
+      else if (arr_uv[n].toInt() >= 6)
+      {
+        level = "橙色";
+      }
+      else if (arr_uv[n].toInt() >= 3)
+      {
+        level = "黃色";
+      }
+      else
+      {
+        level = "綠色";
+      }
+      String message = "\n地區：" + arr_county[n] + "，" + arr_side[n] + "\n紫外線指數，UV：" + arr_uv[n] + "\n紫外線等級：" + level + "\n最後更新時間：" + arr_update_time[n];
       Serial.println(message);
       Line(message);
+
+      char msg[64] = {0};
+
+      strcat(msg, String(arr_county[n]).c_str());
+      strcat(msg, ",");
+      strcat(msg, String(arr_side[n]).c_str());
+      strcat(msg, ",");
+      strcat(msg, String(arr_uv[n]).c_str());
+      strcat(msg, ",");
+      strcat(msg, level.c_str());
+
+      client.publish("UV_Return", msg);
+
       old_time = arr_update_time[0];
     }
   }
