@@ -235,7 +235,7 @@ void display()
         lcd.clear();
 
         lcd.setCursor(0, 0);
-        lcd.print("UV：" + arr_uv[n]);
+        lcd.print("UV:" + arr_uv[n]);
         lcd.setCursor(0, 1);
         lcd.print(arr_update_time[n]);
 
