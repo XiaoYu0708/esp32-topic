@@ -1,4 +1,6 @@
 #include <WiFi.h>
+#include <LiquidCrystal_I2C_Hangul.h>
+#include <Wire.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 #include <HTTPClient.h>
@@ -31,6 +33,8 @@ String arr_update_time[34];
 WiFiClient espClient;
 PubSubClient client(espClient);
 WiFiClientSecure line_client; // 網路連線物件
+
+LiquidCrystal_I2C_Hangul lcd(0x27, 16, 2);
 
 void setup()
 {
@@ -73,6 +77,9 @@ void setup()
   }
 
   line_client.setInsecure(); // ESP32核心 1.0.6以上
+
+  lcd.init();
+  lcd.backlight();
 }
 
 void loop()
@@ -224,6 +231,13 @@ void display()
 
         client.publish("UV_Return", msg);
         client.publish("UV_Return_error", "");
+
+        lcd.clear();
+
+        lcd.setCursor(0, 0);
+        lcd.print("UV：" + arr_uv[n]);
+        lcd.setCursor(0, 1);
+        lcd.print(arr_update_time[n]);
 
         error_url = 0;
       }
