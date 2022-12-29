@@ -5,7 +5,6 @@
 #include <CString>
 #include <iostream>
 #include <WiFiClientSecure.h>
-
 using namespace std;
 
 #define USE_SERIAL Serial
@@ -13,7 +12,7 @@ using namespace std;
 const char ssid[] = "WTY";
 const char password[] = "A940812A";
 const char url[] = "https://data.epa.gov.tw/api/v2/uv_s_01?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=34&sort=publishtime%20desc&format=JSON";
-const char *mqttServer = "192.168.0.104";
+const char *mqttServer = "192.168.1.35";
 const int mqttPort = 1883;
 const char *mqttUser = "";
 const char *mqttPassword = "";
@@ -22,7 +21,7 @@ char host[] = "notify-api.line.me"; // LINE Notify API網址
 String Linetoken = "rOHJ8EqnoiDD1fYXOdRDGyWvwGYbxmlwc8IvZigPLOk";
 
 String Side, old_time;
-int config = 1;
+int config = 1, error_url = 0;
 
 String arr_county[34];
 String arr_side[34];
@@ -153,10 +152,11 @@ void loop()
     Line("請先選擇地區！");
     config = 0;
   }
-  if (old_time != arr_update_time[0])
+  if (old_time != arr_update_time[0] && error_url == 0)
   {
     display();
   }
+
   client.loop();
   http.end();
 }
@@ -203,22 +203,52 @@ void display()
       {
         level = "綠色";
       }
-      String message = "\n地區：" + arr_county[n] + "，" + arr_side[n] + "\n紫外線指數，UV：" + arr_uv[n] + "\n紫外線等級：" + level + "\n最後更新時間：" + arr_update_time[n];
-      Serial.println(message);
-      Line(message);
 
-      char msg[64] = {0};
+      if (arr_uv[n].toInt() >= 0)
+      {
+        String message = "\n地區：" + arr_county[n] + "，" + arr_side[n] + "\n紫外線指數，UV：" + arr_uv[n] + "\n紫外線等級：" + level + "\n最後更新時間：" + arr_update_time[n];
+        Serial.println(message);
+        Line(message);
 
-      strcat(msg, String(arr_county[n]).c_str());
-      strcat(msg, ",");
-      strcat(msg, String(arr_side[n]).c_str());
-      strcat(msg, ",");
-      strcat(msg, String(arr_uv[n]).c_str());
-      strcat(msg, ",");
-      strcat(msg, level.c_str());
+        char msg[64] = {0};
 
-      client.publish("UV_Return", msg);
+        strcat(msg, String(arr_county[n]).c_str());
+        strcat(msg, ",");
+        strcat(msg, String(arr_side[n]).c_str());
+        strcat(msg, ",");
+        strcat(msg, String(arr_uv[n]).c_str());
+        strcat(msg, ",");
+        strcat(msg, level.c_str());
+        strcat(msg, ",");
+        strcat(msg, String(arr_update_time[n]).c_str());
 
+        client.publish("UV_Return", msg);
+        client.publish("UV_Return_error", "");
+
+        error_url = 0;
+      }
+      else
+      {
+        String message = arr_county[n] + arr_side[n] + "\n網站錯誤：\nhttps://data.epa.gov.tw/api/v2/uv_s_01?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=34&sort=publishtime%20desc&format=JSON";
+
+        Line(message);
+
+        char msg[64] = {0};
+
+        strcat(msg, String(arr_county[n]).c_str());
+        strcat(msg, ",");
+        strcat(msg, String(arr_side[n]).c_str());
+        strcat(msg, ",");
+        strcat(msg, 0);
+        strcat(msg, ",");
+        strcat(msg, "error");
+        strcat(msg, ",");
+        strcat(msg, "error");
+
+        client.publish("UV_Return", msg);
+        client.publish("UV_Return_error", "網站錯誤");
+        error_url = 1;
+      }
       old_time = arr_update_time[0];
     }
   }
