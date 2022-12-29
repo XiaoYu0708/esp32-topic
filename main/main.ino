@@ -261,6 +261,11 @@ void display()
 
         client.publish("UV_Return", msg);
         client.publish("UV_Return_error", "網站錯誤");
+
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("error");
+
         error_url = 1;
       }
       old_time = arr_update_time[0];
