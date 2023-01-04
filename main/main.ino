@@ -80,6 +80,8 @@ void setup()
 
   lcd.init();
   lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Choose Area");
 }
 
 void loop()
