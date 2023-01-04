@@ -253,7 +253,7 @@ void display()
         strcat(msg, ",");
         strcat(msg, String(arr_side[n]).c_str());
         strcat(msg, ",");
-        strcat(msg, 0);
+        strcat(msg, "0");
         strcat(msg, ",");
         strcat(msg, "error");
         strcat(msg, ",");
