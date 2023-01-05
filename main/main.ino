@@ -11,10 +11,10 @@ using namespace std;
 
 #define USE_SERIAL Serial
 
-const char ssid[] = "WTY_GWL";
+const char ssid[] = "WTY";
 const char password[] = "A940812A";
 const char url[] = "https://data.epa.gov.tw/api/v2/uv_s_01?api_key=e8dd42e6-9b8b-43f8-991e-b3dee723a52d&limit=34&sort=publishtime%20desc&format=JSON";
-const char *mqttServer = "192.168.0.105";
+const char *mqttServer = "192.168.128.35";
 const int mqttPort = 1883;
 const char *mqttUser = "";
 const char *mqttPassword = "";
